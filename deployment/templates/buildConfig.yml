@@ -1,0 +1,20 @@
+{{ if .Values.build.deploy }}
+kind: 'BuildConfig'
+apiVersion: 'build.openshift.io/v1'
+metadata:
+  name: {{ include "sample-dotnet-app.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sample-dotnet-app.name" . }}
+    helm.sh/chart: {{ include "sample-dotnet-app.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  source:
+    type: Binary
+  strategy:
+    type: Docker
+  output:
+    to:
+      kind: 'ImageStreamTag'
+      name: "{{ include "sample-dotnet-app.name" . }}:latest"
+{{ end }}

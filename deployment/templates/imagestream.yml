@@ -1,0 +1,9 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ include "sample-dotnet-app.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sample-dotnet-app.name" . }}
+    helm.sh/chart: {{ include "sample-dotnet-app.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
