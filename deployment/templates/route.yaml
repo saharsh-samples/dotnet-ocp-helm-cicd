@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  host: {{ .Values.ingress.host }}
+  host: {{ .Values.route.host }}
   path: /
   port:
     targetPort: http
