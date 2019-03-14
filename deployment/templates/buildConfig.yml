@@ -16,5 +16,5 @@ spec:
   output:
     to:
       kind: 'ImageStreamTag'
-      name: "{{ include "sample-dotnet-app.name" . }}:latest"
+      name: "{{ include "sample-dotnet-app.name" . }}:{{ .Values.image.tag }}"
 {{ end }}
