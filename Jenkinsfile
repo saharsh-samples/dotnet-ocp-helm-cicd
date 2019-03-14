@@ -213,7 +213,7 @@ pipeline {
         devRouteHost         = "${devRouteHost}"
 
         // Jenkins Properties
-        k8sTokenCredentialId      = "${clusterAuthCredentialId}"
+        clusterAuthCredentialId   = "${clusterAuthCredentialId}"
         gitCredentialId           = "${gitCredentialId}"
         confirmationTimeoutValue  = "${confirmationTimeoutValue}"
         confirmationTimeoutUnits  = "${confirmationTimeoutUnits}"
@@ -246,7 +246,7 @@ pipeline {
                     // Read Helm Chart file line by line
                     readFile(helmChartFile).split('\r|\n').each({ line ->
 
-                        // Look for line that starts with 'version'
+                        // Look for line that starts with 'appVersion'
                         if(line.trim().startsWith("appVersion")) {
 
                             // Strip out everything on the line except the semantic version (i.e. #.#.#)
