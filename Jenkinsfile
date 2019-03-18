@@ -184,6 +184,7 @@ pipeline {
         string(name: 'prodRouteHost', defaultValue: 'dotnet-ocp-helm-sample-sample-projects.192.168.99.100.nip.io', description:'Route Host to set when deploying in Production environment.')
 
         // Jenkins Properties
+        string(name: 'k8sCloudForDynamicSlaves', defaultValue: 'openshift', description: 'Cloud name for Kubernetes cluster where Jenkins slave pods will be spawned')
         string(name: 'clusterAuthCredentialId', defaultValue: 'ocp-cluster-auth', description: 'ID of Jenkins credential containing OCP Cluster authentication for Helm deploys')
         string(name: 'gitCredentialId', defaultValue: 'git-auth', description: 'ID of Jenkins credential containing Git server username and password')
         string(name: 'confirmationTimeoutValue', defaultValue: '5', description: 'Integer indicating length of time to wait for manual confirmation')
@@ -213,6 +214,7 @@ pipeline {
         devRouteHost         = "${devRouteHost}"
 
         // Jenkins Properties
+        k8sCloudForDynamicSlaves  = "${k8sCloudForDynamicSlaves}"
         clusterAuthCredentialId   = "${clusterAuthCredentialId}"
         gitCredentialId           = "${gitCredentialId}"
         confirmationTimeoutValue  = "${confirmationTimeoutValue}"
@@ -242,6 +244,10 @@ pipeline {
 
                 // set build version from helm chart and current branch
                 script {
+
+                    // Read Pod templates for dynamic slaves from files
+                    env.buildahAgentYaml = readFile '.jenkins/buildah-agent.yml'
+                    env.ocpHelmAgentYaml = readFile '.jenkins/ocp-helm-agent.yml'
 
                     // Read Helm Chart file line by line
                     readFile(helmChartFile).split('\r|\n').each({ line ->
@@ -282,31 +288,9 @@ pipeline {
             // 'Feature branch build' agent pod template
             agent {
                 kubernetes {
-                    cloud 'openshift'
+                    cloud k8sCloudForDynamicSlaves
                     label 'buildah'
-                    yaml """
-apiVersion: v1
-kind: Pod
-spec:
-    serviceAccountName: jenkins-privileged
-    containers:
-      - name: jnlp
-        image: 'jenkinsci/jnlp-slave:alpine'
-      - name: buildah
-        image: 'saharshsingh/container-management:1.0'
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/cat
-        tty: true
-        securityContext:
-          privileged: true
-        volumeMounts:
-          - mountPath: /var/lib/containers
-            name: buildah-storage
-    volumes:
-      - name: buildah-storage
-        emptyDir: {}
-"""
+                    yaml buildahAgentYaml
                 }
             }
 
@@ -335,28 +319,9 @@ spec:
             // 'Deploy to Staging' agent pod template
             agent {
                 kubernetes {
-                    cloud 'openshift'
-                    label 'ocp-build-agent'
-                    yaml """
-apiVersion: v1
-kind: Pod
-spec:
-    containers:
-      - name: jnlp
-        image: 'jenkinsci/jnlp-slave:alpine'
-      - name: helm
-        image: 'saharshsingh/helm:2.12.3'
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/cat
-        tty: true
-      - name: openshift-client
-        image: 'openshift/origin-cli:v3.11.0'
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/cat
-        tty: true
-"""
+                    cloud k8sCloudForDynamicSlaves
+                    label 'ocp-helm-agent'
+                    yaml ocpHelmAgentYaml
                 }
             }
 
@@ -472,28 +437,9 @@ spec:
             // 'Deploy' agent pod template
             agent {
                 kubernetes {
-                    cloud 'openshift'
-                    label 'ocp-build-agent'
-                    yaml """
-apiVersion: v1
-kind: Pod
-spec:
-    containers:
-      - name: jnlp
-        image: 'jenkinsci/jnlp-slave:alpine'
-      - name: helm
-        image: 'saharshsingh/helm:2.12.3'
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/cat
-        tty: true
-      - name: openshift-client
-        image: 'openshift/origin-cli:v3.11.0'
-        imagePullPolicy: IfNotPresent
-        command:
-          - /bin/cat
-        tty: true
-"""
+                    cloud k8sCloudForDynamicSlaves
+                    label 'ocp-helm-agent'
+                    yaml ocpHelmAgentYaml
                 }
             }
 
