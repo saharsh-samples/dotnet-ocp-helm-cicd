@@ -1,10 +1,10 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ include "sample-dotnet-app.name" . }}
+  name: {{ include "app.name" . }}
   labels:
-    app.kubernetes.io/name: {{ include "sample-dotnet-app.name" . }}
-    helm.sh/chart: {{ include "sample-dotnet-app.chart" . }}
+    app.kubernetes.io/name: {{ include "app.name" . }}
+    helm.sh/chart: {{ include "app.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
@@ -14,6 +14,6 @@ spec:
     targetPort: http
   to:
     kind: Service
-    name: {{ include "sample-dotnet-app.name" . }}
+    name: {{ include "app.name" . }}
     weight: 100
   wildcardPolicy: None

@@ -2,10 +2,10 @@
 kind: 'BuildConfig'
 apiVersion: 'build.openshift.io/v1'
 metadata:
-  name: {{ include "sample-dotnet-app.name" . }}
+  name: {{ include "app.name" . }}
   labels:
-    app.kubernetes.io/name: {{ include "sample-dotnet-app.name" . }}
-    helm.sh/chart: {{ include "sample-dotnet-app.chart" . }}
+    app.kubernetes.io/name: {{ include "app.name" . }}
+    helm.sh/chart: {{ include "app.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
@@ -16,5 +16,5 @@ spec:
   output:
     to:
       kind: 'ImageStreamTag'
-      name: "{{ include "sample-dotnet-app.name" . }}:{{ .Values.image.tag }}"
+      name: "{{ include "app.name" . }}:{{ .Values.image.tag }}"
 {{ end }}
