@@ -279,7 +279,7 @@ pipeline {
                             context.clusterUrl        = clusterUrl
                             context.clusterAuthToken  = token
                             context.namespace         = qaNamespace
-                            context.deployBuildConfig = 'true'
+                            context.deployBuildConfig = 'false'
                             context.appVersion        = buildVersionWithHash
                             context.routeHost         = qaRouteHost
                             context.imageTag          = buildVersion
@@ -295,7 +295,7 @@ pipeline {
                         container('openshift-client') {
                             def sourceTag      = developmentNamespace + '/' + appName + ':' + buildVersion
                             def destinationTag = appName + ':latest'
-                            modules.openshift.importTagAndDeploy(insecureCluster, clusterUrl, token, productionNamespace, sourceTag, destinationTag, appName)
+                            modules.openshift.importTagAndDeploy(insecureCluster, clusterUrl, token, qaNamespace, sourceTag, destinationTag, appName)
                         }
 
                     }
@@ -368,7 +368,7 @@ pipeline {
                     // Import image tag and deploy
                     script {
                         container('openshift-client') {
-                            def sourceTag      = qaNamespace + '/' + appName + ':' + buildVersion
+                            def sourceTag      = developmentNamespace + '/' + appName + ':' + buildVersion
                             def destinationTag = appName + ':latest'
                             modules.openshift.importTagAndDeploy(insecureCluster, clusterUrl, token, productionNamespace, sourceTag, destinationTag, null)
                         }
